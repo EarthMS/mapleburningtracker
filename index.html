@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Maplestory Burning Scouter</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000000 100%);
+      color: #e5e7eb;
+    }
+
+    .menu-container {
+      background: rgba(15, 23, 42, 0.96);
+      padding: 24px 28px;
+      border-radius: 16px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      backdrop-filter: blur(16px);
+      max-width: 960px;
+      width: 100%;
+    }
+
+    .menu-header {
+      margin-bottom: 16px;
+    }
+
+    .menu-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #f9fafb;
+      letter-spacing: 0.03em;
+    }
+
+    .menu-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .burnings-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .burning-box {
+      background: #0b1120;
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 34px;
+      font-size: 12px;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+      transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.08s ease,
+        border-color 0.15s ease;
+    }
+
+    .burning-box:hover {
+      background: #020c1f;
+      border-color: #4b5563;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85);
+      transform: translateY(-1px);
+    }
+
+    .burning-label {
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      letter-spacing: 0.06em;
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+
+    .burning-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+
+    .burning-input {
+      width: 54px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      font-size: 12px;
+      text-align: right;
+      background: #020617;
+      color: #f9fafb;
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+      /* Remove spinners in Firefox */
+      -moz-appearance: textfield;
+    }
+
+    /* Remove spinners in Chrome, Edge, Safari */
+    .burning-input::-webkit-outer-spin-button,
+    .burning-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .burning-input::placeholder {
+      color: #6b7280;
+    }
+
+    .burning-input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.55);
+      background: #020c1f;
+    }
+
+    .percent-sign {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .reset-button {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      font-size: 12px;
+      font-weight: 500;
+      color: #e5e7eb;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+      transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.08s ease,
+        border-color 0.15s ease;
+    }
+
+    .reset-button:hover {
+      background: #1f2937;
+      border-color: #818cf8;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+      transform: translateY(-0.5px);
+    }
+
+    .reset-button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+
+    @media (max-width: 900px) {
+      .burnings-grid {
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .burnings-grid {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .menu-container {
+        width: 100%;
+        margin: 16px;
+        padding: 18px;
+      }
+
+      .burnings-grid {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+      }
+
+      .controls {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-container">
+    <div class="menu-header">
+      <div class="menu-title">Maplestory Burning Scouter</div>
+      <div class="menu-subtitle">Enter completion percentage for each Channel</div>
+    </div>
+
+    <div class="burnings-grid" id="burningsGrid">
+      <!-- Boxes will be generated by JavaScript -->
+    </div>
+
+    <div class="controls">
+      <button type="button" class="reset-button" id="resetButton">
+        Reset all to 0%
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const burningsGrid = document.getElementById("burningsGrid");
+
+    // Create 40 burning boxes labeled "CH. 1" to "CH. 40"
+    for (let i = 1; i <= 40; i++) {
+      const box = document.createElement("div");
+      box.className = "burning-box";
+
+      const label = document.createElement("span");
+      label.className = "burning-label";
+      label.textContent = `CH. ${i}`;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "burning-input-wrapper";
+
+      const input = document.createElement("input");
+      input.className = "burning-input";
+      input.type = "number";
+      input.min = "0";
+      input.max = "100";
+      input.step = "1";
+      input.placeholder = "0";
+      input.setAttribute("inputmode", "decimal");
+      input.dataset.burning = i;
+
+      const percent = document.createElement("span");
+      percent.className = "percent-sign";
+      percent.textContent = "%";
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(percent);
+
+      box.appendChild(label);
+      box.appendChild(wrapper);
+      burningsGrid.appendChild(box);
+    }
+
+    // Clamp values to 0 – 100
+    burningsGrid.addEventListener("change", function (e) {
+      if (!e.target.classList.contains("burning-input")) return;
+
+      let value = e.target.value.trim();
+      if (value === "") return;
+
+      let num = Number(value);
+      if (isNaN(num)) {
+        e.target.value = "";
+        return;
+      }
+      if (num < 0) num = 0;
+      if (num > 100) num = 100;
+      e.target.value = num;
+    });
+
+    // Reset button: set all percentages to 0
+    const resetButton = document.getElementById("resetButton");
+    resetButton.addEventListener("click", () => {
+      const inputs = document.querySelectorAll(".burning-input");
+      inputs.forEach(input => {
+        input.value = 0;
+      });
+    });
+  </script>
+</body>
+</html>
