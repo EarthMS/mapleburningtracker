@@ -132,6 +132,39 @@
       background: #020c1f;
     }
 
+    .burning-step {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #111827;
+      color: #e5e7eb;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.08s ease;
+    }
+
+    .burning-step:hover {
+      background: #1f2937;
+      border-color: #818cf8;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+      transform: translateY(-0.5px);
+    }
+
+    .burning-step:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+
     .percent-sign {
       font-size: 11px;
       color: #9ca3af;
@@ -234,6 +267,11 @@
       const wrapper = document.createElement("div");
       wrapper.className = "burning-input-wrapper";
 
+      const minusBtn = document.createElement("button");
+      minusBtn.type = "button";
+      minusBtn.className = "burning-step burning-step-down";
+      minusBtn.textContent = "−";
+
       const input = document.createElement("input");
       input.className = "burning-input";
       input.type = "number";
@@ -248,29 +286,56 @@
       percent.className = "percent-sign";
       percent.textContent = "%";
 
+      const plusBtn = document.createElement("button");
+      plusBtn.type = "button";
+      plusBtn.className = "burning-step burning-step-up";
+      plusBtn.textContent = "+";
+
+      wrapper.appendChild(minusBtn);
       wrapper.appendChild(input);
       wrapper.appendChild(percent);
+      wrapper.appendChild(plusBtn);
 
       box.appendChild(label);
       box.appendChild(wrapper);
       burningsGrid.appendChild(box);
     }
 
-    // Clamp values to 0 – 100
-    burningsGrid.addEventListener("change", function (e) {
-      if (!e.target.classList.contains("burning-input")) return;
-
-      let value = e.target.value.trim();
-      if (value === "") return;
-
+    function clampToRange(value) {
       let num = Number(value);
-      if (isNaN(num)) {
-        e.target.value = "";
-        return;
-      }
+      if (isNaN(num) || value === "") num = 0;
       if (num < 0) num = 0;
       if (num > 100) num = 100;
-      e.target.value = num;
+      return num;
+    }
+
+    // Clamp values to 0 – 100 when input changes
+    burningsGrid.addEventListener("change", function (e) {
+      if (!e.target.classList.contains("burning-input")) return;
+      e.target.value = clampToRange(e.target.value);
+    });
+
+    // Handle +10 / -10 buttons
+    burningsGrid.addEventListener("click", function (e) {
+      if (
+        !e.target.classList.contains("burning-step-up") &&
+        !e.target.classList.contains("burning-step-down")
+      ) {
+        return;
+      }
+
+      const wrapper = e.target.closest(".burning-input-wrapper");
+      const input = wrapper.querySelector(".burning-input");
+      let current = clampToRange(input.value);
+
+      if (e.target.classList.contains("burning-step-up")) {
+        current = current + 10;
+      } else if (e.target.classList.contains("burning-step-down")) {
+        current = current - 10;
+      }
+
+      current = clampToRange(current);
+      input.value = current;
     });
 
     // Reset button: set all percentages to 0
